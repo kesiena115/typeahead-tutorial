@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<!--
+	Demo page: https://twitter.github.io/typeahead.js/
+	Documentation: https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#options
+  -->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Typeahead Example</title>
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
+	
+	
+    <!-- <link href="typeahead.css" rel="stylesheet" /> -->
+
+  </head>
+  <body>
+    <!-- Your HTML here -->
+    <div class="container">
+      <input type="text" class="typeahead form-control" placeholder="Search US State">
+      <input type="text" class="typeahead2 form-control" placeholder="Search Name">
+      <input type="text" class="typeahead3 form-control" placeholder="Search Country">
+      <input type="text" class="typeahead4 form-control" placeholder="Search Country">
+      <input type="text" class="typeahead5 form-control" placeholder="Search Movie">
+      <input type="text" class="typeahead6 form-control" placeholder="Search ezmeeting users">
+    </div>
+
+    <!-- <script src="typeahead.js"></script> -->
+    <!-- <script src="jquery/js/jquery-1.9.0.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+    <!-- <script src="typeahead.js/dist/typeahead.bundle.js"></script>
+    <script src="typeahead.js/dist/bloodhound.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/0.11.1/bloodhound.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js"></script>
+
+    <script type="text/javascript">
+
+    	var substringMatcher = function(strs) {
+		  return function findMatches(q, cb) {
+		    var matches, substringRegex;
+
+		    // an array that will be populated with substring matches
+		    matches = [];
+
+		    // regex used to determine if a string contains the substring `q`
+		    substrRegex = new RegExp(q, 'i'); // 'i' means case-insensitive search
+
+		    // iterate through the pool of strings and for any string that
+		    // contains the substring `q`, add it to the `matches` array
+		    $.each(strs, function(i, str) {
+		      if (substrRegex.test(str)) {
+		        matches.push(str);
+		      }
+		    });
+
+		    cb(matches);
+		  };
+		};
+
+		var states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
+		  'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
+		  'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+		  'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+		  'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+		  'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
+		  'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+		  'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+		  'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+		];
+
+		$('.typeahead').typeahead({
+		  hint: true,
+		  highlight: true,
+		  minLength: 1
+		},
+		{
+		  name: 'states',
+		  source: substringMatcher(states)
+		});
+
+
+		// ##############################################################
+		// Start of name test
+		// ##############################################################
+
+		var mockJson = function(q, cb) {
+			mock = [{'name': "John", "url": "https://i.ytimg.com/vi/-0N8x3RpTZs/maxresdefault.jpg", "age": 15}, 
+			{'name': "kesiena", "url": "https://i.ytimg.com/vi/-0N8x3RpTZs/maxresdefault.jpg", "age": 26},
+			{'name': "Kelly rowland", "url": "https://i.ytimg.com/vi/-0N8x3RpTZs/maxresdefault.jpg", "age": 15}];
+
+			result = [];
+			$.each(mock, function(i, val){
+				if(val.name.toLowerCase().startsWith(q)){
+					result.push(val)
+				}
+			});
+			cb(result);
+		};
+
+		$('.typeahead2').typeahead(
+		{ // options
+		  hint: true, // Only works if the query is part of the return value of the 'display' function below.
+		  highlight: true, // Enables the blue highlight
+		  minLength: 1
+		},
+		{ // datasets
+		  name: 'people',
+		  source: mockJson,
+		  display: function(data){return data.name;}, // The text that'll be displayed when each suggestion is selected.
+		  // valueKey: 'name',
+		  templates: {
+		  	suggestion: function(data){
+		  		// console.log(data);
+		  		return  '<div>' +
+		  					'<div class="suggestion-wrap">' +
+	                    '<span class="search-left">' +
+	                        '<img class="search-img" src="' + data.url + '" alt="pic">' +
+	                    '</span>' +
+	                    '<span class="search-right">' +
+	                        data.name +
+	                    '</span>' +
+	                    '</div>' +
+	                  '</div>';
+		  	}
+		  }
+		}).on('typeahead:selected', function(obj, data){
+			console.log(obj);
+			console.log(data);
+			console.log("name: " + data.name + ", url: " + data.url);
+		});
+
+
+		// ##############################################################
+		// Start of Bloodhound test with local source
+		// ##############################################################
+
+		var country_list = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Cape Verde","Cayman Islands","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cruise Ship","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kuwait","Kyrgyz Republic","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Namibia","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre &amp; Miquelon","Samoa","San Marino","Satellite","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","South Africa","South Korea","Spain","Sri Lanka","St Kitts &amp; Nevis","St Lucia","St Vincent","St. Lucia","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad &amp; Tobago","Tunisia","Turkey","Turkmenistan","Turks &amp; Caicos","Uganda","Ukraine","United Arab Emirates","United Kingdom","Uruguay","Uzbekistan","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
+
+    	$(document).ready(function(){
+    		// Set the Options for "Bloodhound" Engine
+            var my_Suggestion_class = new Bloodhound({
+                limit: 10,
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                local: $.map(country_list, function(item) {
+                    //console.log(item);
+                    return {value: item};
+                })
+            });
+
+        	//Initialize the Suggestion Engine
+	        my_Suggestion_class.initialize();
+
+	        var typeahead_elem = $('.typeahead3');
+	        typeahead_elem.typeahead({
+	            hint: true,
+	            highlight: true,
+	            minLength: 1
+	        },
+	        {
+	            name: 'value',
+	            displayKey: 'value', // Mathches the key in the dictionaries returned by source below. Note that the source function returns a list of dictionaries of the form: [{"value": "country"}, {"value": "country"}, ...]
+	            source: my_Suggestion_class.ttAdapter(),
+	            templates: {
+	                empty: [
+	                    '<div class="noitems">',
+	                    'No Items Found',
+	                    '</div>'
+	                ].join('\n')
+	            }
+	        });
+
+
+		    // ##############################################################
+			// Start of Bloodhound with remote source and prefetch
+			// ##############################################################
+
+	        //Set up "Bloodhound" Options 
+            var my_Suggestion_class2 = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('vval'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                prefetch: {
+                    url: "countries.json",
+                    transform: function(countryArray) {
+                        return $.map(countryArray, function(country) {
+                            return {vval: country.name};
+                        });
+                        //return catAR;
+                    }
+                },
+                remote: {
+                    url: "https://restcountries.eu/rest/v1/name/%QUERY",
+                    transform: function(x) {
+                        return $.map(x, function(item) {
+                            return {vval: "remote: " + item.name};
+                        });
+                    },
+                    wildcard: "%QUERY" // Specifies the part of the url to be replaced with the query
+                }/*,
+                identify : function(datum) {
+                		// Given a datum, this function is expected to return a unique id for it. Defaults to 
+                		// JSON.stringify. Note that it is highly recommended to override this option.
+                	
+                	return datum.vval;
+                }
+                */
+                //http://code.educationgovt.com/typeaheadjs/countries.json
+            });
+
+            // Initialize Typeahead with Parameters
+            my_Suggestion_class2.initialize();
+            var typeahead_elem = $('.typeahead4');
+            typeahead_elem.typeahead({
+                hint: true,
+                highlight: true,
+                minLength: 1
+            },
+            {
+                // `ttAdapter` wraps the suggestion engine in an adapter that
+                // is compatible with the typeahead jQuery plugin
+                name: 'vval',
+                displayKey: 'vval',
+                source: my_Suggestion_class2.ttAdapter()
+            });
+
+
+	        // ################################################################
+			// Start of Bloodhound test with remote source and template output
+			// ################################################################
+			var image_url = "http://image.tmdb.org/t/p/original/";
+			// Instantiate the Bloodhound suggestion engine
+			var movies = new Bloodhound({
+			    datumTokenizer: function (datum) {
+			        return Bloodhound.tokenizers.whitespace(datum.value);
+			    },
+			    queryTokenizer: Bloodhound.tokenizers.whitespace,
+			    remote: {
+			        url: 'http://api.themoviedb.org/3/search/movie?query=%QUERY&api_key=690e5694235959860a153dcd92f83d5e',
+			        filter: function (movies) {
+			            return $.map(movies.results, function (movie) {
+			            	var image_path = "";
+			            	console.log(image_path);
+			            	if (movie.poster_path) {
+			            		image_path = image_url + movie.poster_path;
+			            	}else {
+			            		image_path = "no-img.png"
+			            	}
+			                return {
+			                    value: movie.original_title,
+			                    release_date: movie.release_date,
+			                    poster_path: image_path
+			                };
+			            });
+			        },
+			        wildcard: "%QUERY" // This is essential
+			    }
+			});
+
+			// Initialize the Bloodhound suggestion engine
+			movies.initialize();
+			// Instantiate the Typeahead UI
+			$('.typeahead5').typeahead(null, {
+			    displayKey: 'value',
+			    source: movies.ttAdapter(),
+			    templates: {
+			        suggestion: Handlebars.compile("<p style='padding:6px'><img width=50 src='{{poster_path}}'> <b>{{value}}</b> - Release date {{release_date}} </p>"),
+			        footer: Handlebars.compile("<b>Searched for '{{query}}'</b>")
+			    }
+			});
+
+
+			// ##############################################################
+			// Start of ezmeeting test
+			// ##############################################################
+
+	        //Set up "Bloodhound" Options 
+            var ezmeeting_suggestion = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('displayName'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: "http://ezmeeting.us:9200/ezmeeting/prod/_search?analyze_wildcard=true&q=displayName:*%QUERY*+OR+email:*%QUERY*",
+                    // url: "http://localhost:9200/ezmeeting/prod/_search?analyze_wildcard=true&q=displayName:*%QUERY*+OR+email:*%QUERY*",
+		            prepare: function(query, settings) {
+	                    // So long as we're analyzing wildcards, we don't need to escape the query for '-' to work.
+	                    var escapedQuery = query.replace(/[+-=&\/\\#,()|$~%.'":*?<>{}\[\]]/g,'\\$&');
+	                    settings.url = settings.url.replace(new RegExp('%QUERY', 'g'), escapedQuery);
+	                    return settings;
+	                },
+		            transform: function(x) {
+                        resultList = x.hits.hits
+                        return $.map(resultList, function(item) {
+                            return {displayName: item._source.displayName, url: item._source.pic};
+                        });
+                    }
+                }
+            });
+
+            // Initialize Typeahead with Parameters
+            ezmeeting_suggestion.initialize();
+            var typeahead_elem = $('.typeahead6');
+            typeahead_elem.typeahead({
+                hint: true,
+                highlight: true,
+                minLength: 1
+            },
+            {
+                // `ttAdapter` wraps the suggestion engine in an adapter that
+                // is compatible with the typeahead jQuery plugin
+                name: 'userProfile',
+                displayKey: 'displayName',
+                source: ezmeeting_suggestion.ttAdapter(),
+                templates: {
+                	suggestion: function(data) {
+                		return '<div>' +
+		  							'<div class="suggestion-wrap">' +
+					                    '<span class="search-left">' +
+					                        '<img class="search-img" src="' + data.url + '" alt="pic">' +
+					                    '</span>' +
+					                    '<span class="search-right">' +
+					                        data.displayName +
+					                    '</span>' +
+					                '</div>' +
+					            '</div>';
+                	},
+                	empty: [
+	                    '<div class="noitems">',
+	                    'No user found',
+	                    '</div>'
+	                ].join('\n')
+                }
+            });
+
+
+
+			//Get the Typeahead Value on Following Events
+            $('input').on([
+                'typeahead:initialized',
+                'typeahead:initialized:err',
+                'typeahead:selected',
+                'typeahead:autocompleted',
+                'typeahead:cursorchanged',
+                'typeahead:opened',
+                'typeahead:closed'
+            ].join(' '), function(x) {
+            	console.log(x);
+                console.log(this.value); 
+            });
+
+    	}); // End of $(document).ready()
+    </script>
+
+    <style type = "text/css">
+    	div,p {
+    		font-size: 20px;
+    		font-family: Helvetica, Arial, sans-serif;
+    	}
+
+    	input {
+    		width: 400px;
+    		font-size: 20px;
+    		border-radius: 10px;
+    		padding: 5px 10px;
+    		margin-top: 20px;
+    		border: 1px solid #aaa;
+    		text-align: left;
+    	}
+
+    	.tt-query {
+		  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+		     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+		          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+		}
+
+		.tt-hint {
+		  color: #999
+		}
+
+		.tt-menu {    /* used to be tt-dropdown-menu in older versions */
+		  width: 422px;
+		  margin-top: 4px;
+		  padding: 4px 0;
+		  background-color: #fff;
+		  border: 1px solid #ccc;
+		  border: 1px solid rgba(0, 0, 0, 0.2);
+		  -webkit-border-radius: 4px;
+		     -moz-border-radius: 4px;
+		          border-radius: 4px;
+		  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+		     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+		          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+		}
+
+		.tt-menu p {
+			margin-bottom: 0;
+		}
+
+		.tt-suggestion {
+			padding: 10px;
+		    border-bottom: 1px solid #ccc;
+		}
+
+		.tt-suggestion:last-child {
+		    border-bottom: none;
+		}
+
+		.tt-highlight {
+			color: #0097cf;
+		}
+
+		.tt-suggestion.tt-cursor,.tt-suggestion:hover, .tt-suggestion.tt-cursor .tt-highlight,.tt-suggestion:hover .tt-highlight{
+			/* Seems like .tt-cursor class gets added when the item gains focus if scrolling with down or up keys*/
+		  color: #fff;
+		  background-color: #0097cf;
+
+		}
+
+		.tt-suggestion p {
+		  margin: 0;
+		}
+
+		.suggestion-wrap {
+			display: inline-block; /* To ensure that it grows to the height of the childrens*/
+		}
+
+		.search-left {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			float: left;
+			overflow: hidden;
+			border: 1px solid #ccc;
+			text-align: center;
+		}
+
+		.search-right {
+			left: 9px;
+			top: 8px;
+			position: relative;
+		}
+
+		.search-img {
+			width: 100%;
+			height: 100%;
+			position: relative;
+		}
+
+    </style>
+  </body>
+</html>
