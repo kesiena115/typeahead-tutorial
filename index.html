@@ -345,7 +345,8 @@
                 'typeahead:closed'
             ].join(' '), function(x) {
             	console.log(x);
-                console.log(this.value); 
+                console.log(this.value);
+                // $('input').typeahead('val', ''); // Clear the typeahead input field
             });
 
     	}); // End of $(document).ready()
